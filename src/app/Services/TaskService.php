@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\DTO\Task\{
-    StoreTaskDTO,
-    UpdateTaskDTO
-};
+use App\DTO\Task\{StoreTaskDTO, UpdateTaskDTO};
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Task\TaskResponseDTO;
 use App\Services\TaskStatusService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 
 class TaskStatusController extends Controller
 {
@@ -13,30 +15,30 @@ class TaskStatusController extends Controller
     {
     }
 
-    public function index(): array
+    public function index(): JsonResponse
     {
         $taskStatuses = $this->service->getAll();
 
-        return [
-            'status' => 'success',
-            'data' => $taskStatuses
-        ];
+        $response = new TaskResponseDTO($taskStatuses->toArray());
+
+        return $response->json();
     }
 
-    public function show(int $id): array
+    public function show(int $id): JsonResponse
     {
+        $response = new TaskResponseDTO();
+
         try {
-            $task = $this->service->getById($id);
+            $taskStatus = $this->service->getById($id);
         } catch (ModelNotFoundException $exception) {
-            return [
-                'status' => 'error',
-                'message' => 'Такой задачи не существует'
-            ];
+            $response->setStatus(422);
+            $response->setMessage('Такого статуса задачи не существует');
+
+            return $response->json();
         }
 
-        return [
-            'status' => 'success',
-            'data' => $task
-        ];
+        $response->setData($taskStatus->toArray());
+
+        return $response->json();
     }
 }
