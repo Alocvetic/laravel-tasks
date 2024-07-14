@@ -14,7 +14,7 @@ class Task extends Model
         'title',
         'description',
         'task_status_id',
-        'deadline_date',
+        'deadline_at',
     ];
 
     public function taskStatus(): BelongsTo

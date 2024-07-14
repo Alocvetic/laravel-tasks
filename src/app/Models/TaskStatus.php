@@ -10,6 +10,8 @@ class TaskStatus extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'uuid';
+
     protected $fillable = [
         'title'
     ];
