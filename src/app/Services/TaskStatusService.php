@@ -4,17 +4,27 @@ namespace App\Services;
 
 use App\Models\TaskStatus;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TaskStatusService
 {
+    /**
+     * Получение всех Статусов задач
+     *
+     * @return Collection
+     */
     public function getAll(): Collection
     {
         return TaskStatus::all();
     }
 
-    public function getById(int $id): TaskStatus|ModelNotFoundException
+    /**
+     * Получение Статуса задачи по uuid
+     *
+     * @param string $uuid
+     * @return TaskStatus
+     */
+    public function getByUuid(string $uuid): TaskStatus
     {
-        return TaskStatus::where('id', $id)->firstOrFail();
+        return TaskStatus::where('uuid', $uuid)->firstOrFail();
     }
 }

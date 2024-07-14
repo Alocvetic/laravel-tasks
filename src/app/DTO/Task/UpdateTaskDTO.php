@@ -6,7 +6,7 @@ class UpdateTaskDTO
 {
     public string $title;
     public string $description;
-    public int $task_status_id;
+    public string $task_status_uuid;
     public ?string $deadline_at = null;
 
     public function getTitle(): string
@@ -29,14 +29,14 @@ class UpdateTaskDTO
         $this->description = $description;
     }
 
-    public function getTaskStatusId(): int
+    public function getTaskStatusUuid(): string
     {
-        return $this->task_status_id;
+        return $this->task_status_uuid;
     }
 
-    public function setTaskStatusId(int $task_status_id): void
+    public function setTaskStatusUuid(string $task_status_uuid): void
     {
-        $this->task_status_id = $task_status_id;
+        $this->task_status_uuid = $task_status_uuid;
     }
 
     public function getDeadlineAt(): ?string

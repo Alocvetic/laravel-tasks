@@ -2,43 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Task\TaskResponseDTO;
+use App\Services\Response\ApiResponse;
 use App\Services\TaskStatusService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 
 class TaskStatusController extends Controller
 {
     public function __construct(
         protected TaskStatusService $service
-    )
-    {
+    ) {
     }
 
     public function index(): JsonResponse
     {
         $taskStatuses = $this->service->getAll();
 
-        $response = new TaskResponseDTO($taskStatuses->toArray());
-
-        return $response->json();
+        return ApiResponse::json($taskStatuses->toArray());
     }
 
-    public function show(int $id): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
-        $response = new TaskResponseDTO();
+        $taskStatus = $this->service->getByUuid($uuid);
 
-        try {
-            $taskStatus = $this->service->getById($id);
-        } catch (ModelNotFoundException $exception) {
-            $response->setStatus(422);
-            $response->setMessage('Такого статуса задачи не существует');
-
-            return $response->json();
-        }
-
-        $response->setData($taskStatus->toArray());
-
-        return $response->json();
+        return ApiResponse::json($taskStatus->toArray());
     }
 }

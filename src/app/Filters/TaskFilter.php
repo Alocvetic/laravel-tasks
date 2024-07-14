@@ -2,21 +2,20 @@
 
 namespace App\Filters;
 
+use App\Http\Requests\GetTasksRequest;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 
 class TaskFilter
 {
     public function __construct(
-        protected Request $request,
+        protected GetTasksRequest $request,
         protected Builder $query,
-    )
-    {
+    ) {
         $this->query = Task::query();
     }
 
-    public function buildQuery(Request $request): Builder
+    public function buildQuery(GetTasksRequest $request): Builder
     {
         $this->request = $request;
 
@@ -63,34 +62,19 @@ class TaskFilter
         ];
 
         $filterParams = $this->request->input('filter');
-        foreach ($filterParams as $field => $data) {
+        foreach ($filterParams as $column => $data) {
             foreach ($data as $operator => $value) {
                 if (isset($operatorsList[$operator])) {
-                    $this->query->where($field, $operatorsList[$operator], $value);
+                    $this->query->where($column, $operatorsList[$operator], $value);
                     continue;
                 }
 
+                $taskStatusUuidList = explode(',', $value);
                 match ($operator) {
-                    'in' => $this->query->whereIn($field, $value),
-                    'notIn' => $this->query->whereNotIn($field, $value),
-                    'null' => $this->query->whereNull($field, $value),
-                    'notNull' => $this->query->whereNotNull($field, $value),
+                    'in' => $this->query->whereIn($column, $taskStatusUuidList),
+                    'notIn' => $this->query->whereNotIn($column, $taskStatusUuidList),
                     default => null
                 };
-            }
-        }
-    }
-
-    protected function page(): void
-    {
-        $pageParams = $this->request->input('page');
-        foreach ($pageParams as $param => $value) {
-            if ($param === 'offset') {
-                $this->query->offset($value);
-            }
-
-            if ($param === 'limit') {
-                $this->query->limit($value);
             }
         }
     }
@@ -98,6 +82,52 @@ class TaskFilter
     protected function fields(): void
     {
         $fieldsParams = explode(',', $this->request->input('fields'));
-        $this->query->select($fieldsParams);
+
+        foreach ($fieldsParams as $key => $column) {
+            if (str_contains($column, ':')) {
+                $joinColumn = explode(':', $column);
+
+                if ($joinColumn[0] === 'task_status_uuid') {
+                    $fieldsParams[$key] = 'task_statuses.' . $joinColumn[1] . ' AS ' . 'task_status_' . $joinColumn[1];
+                }
+            } else {
+                $fieldsParams[$key] = 'tasks.' . $column;
+            }
+        }
+
+        $this->query->leftJoin('task_statuses', 'tasks.task_status_uuid', '=', 'task_statuses.uuid')
+            ->select($fieldsParams);
+    }
+
+    protected function page(): void
+    {
+        $pageParams = $this->request->input('page');
+        foreach ($pageParams as $param => $value) {
+            if ($param === 'limit') {
+                $this->query->limit((int)$value);
+            }
+
+            if ($param === 'offset') {
+                $this->query->offset((int)$value);
+            }
+        }
+    }
+
+    /**
+     * Получение данных для пагинации
+     *
+     * @return array|null
+     */
+    public function buildPaginateData(): array|null
+    {
+        $pageParams = $this->request->input('page');
+
+        $paginateData = null;
+        if (isset($pageParams['limit']) && isset($pageParams['number'])) {
+            $paginateData['limit'] = (int)$pageParams['limit'];
+            $paginateData['number'] = (int)$pageParams['number'];
+        }
+
+        return $paginateData;
     }
 }

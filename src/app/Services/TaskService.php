@@ -4,29 +4,34 @@ namespace App\Services;
 
 use App\DTO\Task\{StoreTaskDTO, UpdateTaskDTO};
 use App\Filters\TaskFilter;
+use App\Http\Requests\GetTasksRequest;
 use App\Models\Task;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 
 class TaskService
 {
     public function __construct(
         protected TaskFilter $taskFilter
-    )
-    {
+    ) {
     }
 
     /**
      * Получение всех Задач
      *
-     * @param Request $request
-     * @return Collection
+     * @param GetTasksRequest $request
+     * @return LengthAwarePaginator|Collection
      */
-    public function getAll(Request $request): Collection
+    public function getAll(GetTasksRequest $request): LengthAwarePaginator|Collection
     {
         if (!empty($request->query())) {
             $query = $this->taskFilter->buildQuery($request);
+
+            $paginateData = $this->taskFilter->buildPaginateData();
+            if (!is_null($paginateData)) {
+                return $query->paginate(perPage: $paginateData['limit'], page: $paginateData['number']);
+            }
+
             return $query->get();
         }
 
@@ -38,9 +43,9 @@ class TaskService
      * Получение Задачи по id
      *
      * @param int $id
-     * @return Task|ModelNotFoundException
+     * @return Task
      */
-    public function getById(int $id): Task|ModelNotFoundException
+    public function getById(int $id): Task
     {
         return Task::where('id', $id)->firstOrFail();
     }
@@ -101,7 +106,7 @@ class TaskService
         $task->title = $dto->getTitle();
         $task->description = $dto->getDescription();
         $task->deadline_at = $dto->getDeadlineAt();
-        $task->task_status_id = $dto->getTaskStatusId();
+        $task->task_status_uuid = $dto->getTaskStatusUuid();
 
         return $task;
     }

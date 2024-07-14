@@ -16,6 +16,10 @@ class TaskStatus extends Model
         'title'
     ];
 
+    protected $casts = [
+        'uuid' => 'string'
+    ];
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);

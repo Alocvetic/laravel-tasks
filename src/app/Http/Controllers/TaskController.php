@@ -2,46 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Task\TaskResponseDTO;
-use Illuminate\Http\Request;
-use App\Http\Requests\{StoreTaskRequest, UpdateTaskRequest};
+use App\Http\Requests\{GetTasksRequest, StoreTaskRequest, UpdateTaskRequest};
+use App\Services\Response\ApiResponse;
+use App\Services\Response\BuildResponseHelper;
 use App\Services\TaskService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 
 class TaskController extends Controller
 {
     public function __construct(
         protected TaskService $service
-    )
-    {
+    ) {
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(GetTasksRequest $request): JsonResponse
     {
         $tasks = $this->service->getAll($request);
+        $result = BuildResponseHelper::buildResponseData($tasks);
 
-        $response = new TaskResponseDTO($tasks->toArray());
-
-        return $response->json();
+        return ApiResponse::json($result);
     }
 
     public function show(int $id): JsonResponse
     {
-        $response = new TaskResponseDTO();
+        $task = $this->service->getById($id);
 
-        try {
-            $task = $this->service->getById($id);
-        } catch (ModelNotFoundException $exception) {
-            $response->setStatus(422);
-            $response->setMessage('Такой задачи не существует');
-
-            return $response->json();
-        }
-
-        $response->setData($task->toArray());
-
-        return $response->json();
+        return ApiResponse::json($task->toArray());
     }
 
     public function store(StoreTaskRequest $request): JsonResponse
@@ -49,45 +35,29 @@ class TaskController extends Controller
         $dto = $request->toDto();
         $id = $this->service->create($dto);
 
-        $response = new TaskResponseDTO(['id' => $id]);
-
-        return $response->json();
+        return ApiResponse::json(['id' => $id], message: 'Задача успешно создана');
     }
 
     public function update(UpdateTaskRequest $request, int $id): JsonResponse
     {
-        $response = new TaskResponseDTO();
-
         if (!$this->service->checkById($id)) {
-            $response->setStatus(422);
-            $response->setMessage('Такой задачи не существует');
-
-            return $response->json();
+            return ApiResponse::json(status: 404, message: 'Такой задачи не существует');
         }
 
         $dto = $request->toDto();
         $id = $this->service->update($id, $dto);
 
-        $response = new TaskResponseDTO(['id' => $id]);
-
-        return $response->json();
+        return ApiResponse::json(['id' => $id], message: 'Задача успешно обновлена');
     }
 
     public function delete(int $id): JsonResponse
     {
-        $response = new TaskResponseDTO();
-
         if (!$this->service->checkById($id)) {
-            $response->setStatus(422);
-            $response->setMessage('Такой задачи не существует');
-
-            return $response->json();
+            return ApiResponse::json(status: 404, message: 'Такой задачи не существует');
         }
 
         $this->service->delete($id);
 
-        $response = new TaskResponseDTO(['id' => $id]);
-
-        return $response->json();
+        return ApiResponse::json(message: 'Задача успешно удалена');
     }
 }

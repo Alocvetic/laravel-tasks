@@ -35,7 +35,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost/api/tasks?filter[task_status_id][eq]=1&filter[deadline_at][gte]=2025-01-01&filter[deadline_at][lte]=2025-12-31",
+									"raw": "https://localhost/api/tasks?filter[deadline_at][lte]=2024-08-31&filter[deadline_at][gte]=2024-07-20",
 									"protocol": "https",
 									"host": [
 										"localhost"
@@ -46,16 +46,27 @@
 									],
 									"query": [
 										{
-											"key": "filter[task_status_id][eq]",
-											"value": "1"
+											"key": "filter[deadline_at][lte]",
+											"value": "2024-08-31"
 										},
 										{
 											"key": "filter[deadline_at][gte]",
-											"value": "2025-01-01"
+											"value": "2024-07-20"
 										},
 										{
-											"key": "filter[deadline_at][lte]",
-											"value": "2025-12-31"
+											"key": "filter[task_status_uuid][eq]",
+											"value": "5ac8bfab-d929-46cf-a300-d464216ae5e8",
+											"disabled": true
+										},
+										{
+											"key": "filter[task_status_uuid][ne]",
+											"value": "5ac8bfab-d929-46cf-a300-d464216ae5e8",
+											"disabled": true
+										},
+										{
+											"key": "filter[task_status_uuid][in]",
+											"value": "28ec059d-da72-4eeb-add8-d1f1d677cda0,5ac8bfab-d929-46cf-a300-d464216ae5e8",
+											"disabled": true
 										}
 									]
 								}
@@ -85,7 +96,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost/api/tasks?sort=task_status_id,-title",
+									"raw": "https://localhost/api/tasks?sort=deadline_at,-title",
 									"protocol": "https",
 									"host": [
 										"localhost"
@@ -97,53 +108,7 @@
 									"query": [
 										{
 											"key": "sort",
-											"value": "task_status_id,-title"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get with paginate",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Accept",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://localhost/api/tasks?page[limit]=3&page[offset]=3",
-									"protocol": "https",
-									"host": [
-										"localhost"
-									],
-									"path": [
-										"api",
-										"tasks"
-									],
-									"query": [
-										{
-											"key": "page[limit]",
-											"value": "3"
-										},
-										{
-											"key": "page[offset]",
-											"value": "3"
+											"value": "deadline_at,-title"
 										}
 									]
 								}
@@ -173,7 +138,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost/api/tasks?fields=title,description,task_status_id",
+									"raw": "https://localhost/api/tasks?fields=title,description,task_status_uuid:title",
 									"protocol": "https",
 									"host": [
 										"localhost"
@@ -185,7 +150,58 @@
 									"query": [
 										{
 											"key": "fields",
-											"value": "title,description,task_status_id"
+											"value": "title,description,task_status_uuid:title"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get with paginate",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost/api/tasks?page[number]=1&page[limit]=2",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"path": [
+										"api",
+										"tasks"
+									],
+									"query": [
+										{
+											"key": "page[number]",
+											"value": "1"
+										},
+										{
+											"key": "page[limit]",
+											"value": "2"
+										},
+										{
+											"key": "page[offset]",
+											"value": "4",
+											"disabled": true
 										}
 									]
 								}
@@ -276,11 +292,16 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"test 1\",\r\n    \"description\": \"test test test\", \r\n    \"deadline_at\": \"2025-03-13\", \r\n    \"task_status_id\": 1\r\n}",
+							"raw": "{\r\n    \"title\": \"test 1\",\r\n    \"description\": \"test test test\", \r\n    \"deadline_at\": \"2025-03-13\", \r\n    \"task_status_uuid\": \"a68289bc-d66e-4713-8f7e-675868bf3f67\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -334,7 +355,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"test 2\",\r\n    \"description\": \"test 2\", \r\n    \"deadline_at\": \"2025-05-15\", \r\n    \"task_status_id\": 5\r\n}",
+							"raw": "{\r\n    \"title\": \"test 2\",\r\n    \"description\": \"test 2\", \r\n    \"deadline_at\": \"2025-05-15\", \r\n    \"task_status_uuid\": \"a68289bc-d66e-4713-8f7e-675868bf3f67\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -425,8 +446,7 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -463,8 +483,7 @@
 						"header": [
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -477,7 +496,7 @@
 							}
 						},
 						"url": {
-							"raw": "https://localhost/api/tasks-statuses/1",
+							"raw": "https://localhost/api/tasks-statuses/a68289bc-d66e-4713-8f7e-675868bf3f67",
 							"protocol": "https",
 							"host": [
 								"localhost"
@@ -485,7 +504,7 @@
 							"path": [
 								"api",
 								"tasks-statuses",
-								"1"
+								"a68289bc-d66e-4713-8f7e-675868bf3f67"
 							]
 						}
 					},
