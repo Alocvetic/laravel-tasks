@@ -9,7 +9,6 @@
 - php, mysql
 - Laravel
 - git, docker
-- redoc-cli (документации api)
 
 ***
 
@@ -21,9 +20,4 @@
 ## [Структура проекта](readme/structure.md)
 
 Структура проекта и кода
-***
-
-## [Документация к API](readme/doc_api.md)
-
-Документация к api через redoc cli
 ***

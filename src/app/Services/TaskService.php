@@ -3,21 +3,36 @@
 namespace App\Services;
 
 use App\DTO\Task\{StoreTaskDTO, UpdateTaskDTO};
+use App\Filters\TaskFilter;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class TaskService
 {
+    public function __construct(
+        protected TaskFilter $taskFilter
+    )
+    {
+    }
+
     /**
      * Получение всех Задач
      *
+     * @param Request $request
      * @return Collection
      */
-    public function getAll(): Collection
+    public function getAll(Request $request): Collection
     {
+        if (!empty($request->query())) {
+            $query = $this->taskFilter->buildQuery($request);
+            return $query->get();
+        }
+
         return Task::all();
     }
+
 
     /**
      * Получение Задачи по id

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Task\TaskResponseDTO;
+use Illuminate\Http\Request;
 use App\Http\Requests\{StoreTaskRequest, UpdateTaskRequest};
 use App\Services\TaskService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,9 +17,9 @@ class TaskController extends Controller
     {
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $tasks = $this->service->getAll();
+        $tasks = $this->service->getAll($request);
 
         $response = new TaskResponseDTO($tasks->toArray());
 
